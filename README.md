@@ -4,11 +4,11 @@ A modern, responsive portfolio website for Ibrahim Memon - Software Engineer & U
 
 ## Features
 
-- 🎨 Modern dark theme with purple gradients
-- 📱 Fully responsive design
-- ✨ Smooth animations and transitions
-- 🎯 Clean and professional layout
-- 🚀 Fast loading and optimized
+-  Modern dark theme with purple gradients
+-  Fully responsive design
+-  Smooth animations and transitions
+-  Clean and professional layout
+-  Fast loading and optimized
 
 ## Structure
 
