@@ -83,8 +83,9 @@ export default function ProjectsList() {
       imageImg.src = imageSrc;
 
       gsap.to(image, {
-        opacity: 1,
+        autoAlpha: 1,
         scale: 1,
+        y: 0,
         duration: 0.4,
         ease: 'power2.out',
       });
@@ -92,8 +93,9 @@ export default function ProjectsList() {
 
     const handleProjectLeave = () => {
       gsap.to(image, {
-        opacity: 0,
-        scale: 0.8,
+        autoAlpha: 0,
+        scale: 0.94,
+        y: 10,
         duration: 0.3,
         ease: 'power2.in',
       });
@@ -181,7 +183,7 @@ export default function ProjectsList() {
 
       <div
         ref={imageRef}
-        className="fixed right-8 top-1/2 -translate-y-1/2 w-80 h-80 xl:w-96 xl:h-96 pointer-events-none z-40 opacity-0 hidden lg:block"
+        className="fixed right-10 top-28 w-80 h-80 xl:w-96 xl:h-96 pointer-events-none z-40 opacity-0 hidden lg:block"
         style={{
           transformOrigin: 'center center',
         }}
