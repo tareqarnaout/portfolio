@@ -1,5 +1,3 @@
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
 import { motion } from 'motion/react';
 
 interface Project {
@@ -70,60 +68,6 @@ const projects: Project[] = [
 ];
 
 export default function ProjectsList() {
-  const listRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const imageImgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    const image = imageRef.current;
-    const imageImg = imageImgRef.current;
-    if (!image || !imageImg) return;
-
-    const handleProjectHover = (_projectId: string, imageSrc: string) => {
-      imageImg.src = imageSrc;
-
-      gsap.to(image, {
-        autoAlpha: 1,
-        scale: 1,
-        y: 0,
-        duration: 0.4,
-        ease: 'power2.out',
-      });
-    };
-
-    const handleProjectLeave = () => {
-      gsap.to(image, {
-        autoAlpha: 0,
-        scale: 0.94,
-        y: 10,
-        duration: 0.3,
-        ease: 'power2.in',
-      });
-    };
-
-    const projectItems = listRef.current?.querySelectorAll('[data-project-id]');
-    const cleanupCallbacks: Array<() => void> = [];
-
-    projectItems?.forEach((item) => {
-      const projectId = item.getAttribute('data-project-id') || '';
-      const imageSrc = item.getAttribute('data-project-image') || '';
-      const onMouseEnter = () => handleProjectHover(projectId, imageSrc);
-      const onMouseLeave = () => handleProjectLeave();
-
-      item.addEventListener('mouseenter', onMouseEnter);
-      item.addEventListener('mouseleave', onMouseLeave);
-
-      cleanupCallbacks.push(() => {
-        item.removeEventListener('mouseenter', onMouseEnter);
-        item.removeEventListener('mouseleave', onMouseLeave);
-      });
-    });
-
-    return () => {
-      cleanupCallbacks.forEach((cleanup) => cleanup());
-    };
-  }, []);
-
   return (
     <section className="py-32 px-8 md:px-16 max-w-7xl mx-auto" id="projects">
       <motion.h2
@@ -136,7 +80,7 @@ export default function ProjectsList() {
         SELECTED WORK
       </motion.h2>
 
-      <div ref={listRef} className="space-y-12">
+      <div className="space-y-12">
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
@@ -148,11 +92,9 @@ export default function ProjectsList() {
               delay: index * 0.1,
               ease: [0.22, 1, 0.36, 1],
             }}
-            data-project-id={project.id}
-            data-project-image={project.image}
-            className="border-t border-black/10 pt-12 cursor-pointer group"
+            className="border-t border-black/10 pt-12 group"
           >
-            <div className="flex items-start justify-between gap-8">
+            <div className="flex items-start justify-between gap-10 lg:gap-12">
               <div className="flex-1">
                 <div className="flex items-baseline gap-4 mb-4">
                   <span className="text-2xl font-bold text-black/30">
@@ -176,24 +118,20 @@ export default function ProjectsList() {
                   ))}
                 </div>
               </div>
+
+              <div className="hidden lg:block w-72 xl:w-80 shrink-0">
+                <div className="relative overflow-hidden rounded-sm border border-black/10 bg-white/60 p-2 shadow-lg opacity-0 scale-[0.96] translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full aspect-[4/3] object-cover rounded-[2px]"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
         ))}
-      </div>
-
-      <div
-        ref={imageRef}
-        className="fixed right-10 top-28 w-80 h-80 xl:w-96 xl:h-96 pointer-events-none z-40 opacity-0 hidden lg:block"
-        style={{
-          transformOrigin: 'center center',
-        }}
-      >
-        <img
-          ref={imageImgRef}
-          src=""
-          alt=""
-          className="w-full h-full object-cover shadow-2xl"
-        />
       </div>
     </section>
   );
