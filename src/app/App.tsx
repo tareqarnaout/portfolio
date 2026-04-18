@@ -166,86 +166,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Interactive SVG Navigator */}
-      <section className="px-4 md:px-8 pb-16 md:pb-24">
-        <div className="max-w-6xl mx-auto rounded-[28px] bg-[#f1f3f6]/90 border border-black/10 overflow-hidden relative">
-          <div className="relative h-[420px] md:h-[560px]">
-            <svg
-              viewBox="0 0 1200 650"
-              className="absolute inset-0 w-full h-full"
-              aria-hidden="true"
-            >
-              <defs>
-                <linearGradient id="armPipe" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#c8cbd3" />
-                  <stop offset="100%" stopColor="#8f95a3" />
-                </linearGradient>
-                <linearGradient id="orbGlass" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#a7dff4" stopOpacity="0.95" />
-                  <stop offset="100%" stopColor="#6fb5d1" stopOpacity="0.95" />
-                </linearGradient>
-                <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              <path d="M600 0 v85 c0 24 18 34 35 34 h36 c24 0 35 14 35 32 v14 c0 18-11 31-35 31 h-60 c-23 0-34 12-34 30" fill="none" stroke="#a7abb2" strokeWidth="7" strokeLinecap="round" />
-
-              <path d="M375 275 C450 250 505 275 540 315" fill="none" stroke="url(#armPipe)" strokeWidth="12" strokeLinecap="round" />
-              <path d="M825 275 C750 250 695 275 660 315" fill="none" stroke="url(#armPipe)" strokeWidth="12" strokeLinecap="round" />
-              <path d="M390 450 C470 470 525 450 555 420" fill="none" stroke="url(#armPipe)" strokeWidth="12" strokeLinecap="round" />
-              <path d="M810 450 C730 470 675 450 645 420" fill="none" stroke="url(#armPipe)" strokeWidth="12" strokeLinecap="round" />
-
-              <circle cx="600" cy="360" r="145" fill="url(#orbGlass)" stroke="#68b1cd" strokeWidth="10" filter="url(#softGlow)" />
-              <ellipse cx="600" cy="320" rx="88" ry="62" fill="#f7c9de" opacity="0.9" />
-              <path d="M545 320 q20-24 40 0 q20 24 40 0 q20-24 40 0" fill="none" stroke="#e9a1c4" strokeWidth="8" strokeLinecap="round" />
-              <path d="M525 355 q25-20 50 4 q25 24 50 0 q25-24 50 4" fill="none" stroke="#d38bb4" strokeWidth="7" strokeLinecap="round" />
-
-              <ellipse cx="555" cy="280" rx="52" ry="16" fill="#ffffff" opacity="0.35" transform="rotate(-22 555 280)" />
-              <ellipse cx="640" cy="430" rx="72" ry="10" fill="#ffffff" opacity="0.25" />
-
-              <circle cx="495" cy="272" r="6" fill="#bcc1c9" />
-              <circle cx="705" cy="272" r="6" fill="#bcc1c9" />
-              <circle cx="470" cy="458" r="6" fill="#bcc1c9" />
-              <circle cx="730" cy="458" r="6" fill="#bcc1c9" />
-
-              <circle cx="890" cy="170" r="4" fill="#f06292" className="animate-float" />
-              <circle cx="920" cy="250" r="3" fill="#5ec2ee" className="animate-float" style={{ animationDelay: '0.6s' }} />
-              <circle cx="308" cy="220" r="4" fill="#ffd54f" className="animate-float" style={{ animationDelay: '1s' }} />
-              <circle cx="280" cy="470" r="5" fill="#31c06b" className="animate-float" style={{ animationDelay: '0.3s' }} />
-            </svg>
-
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.06, x: 4 }}
-              className="absolute right-[8%] top-[26%] text-4xl md:text-6xl font-black tracking-tight text-[#ef3f36]"
-            >
-              PROJECTS
-            </motion.a>
-
-            <motion.a
-              href="#contact"
-              whileHover={{ scale: 1.06, x: 4 }}
-              className="absolute left-[8%] top-[62%] text-4xl md:text-6xl font-black tracking-tight text-[#089a4f]"
-            >
-              CONTACT
-            </motion.a>
-
-            <motion.a
-              href="#skills"
-              whileHover={{ scale: 1.06, x: 4 }}
-              className="absolute left-[10%] top-[30%] text-3xl md:text-5xl font-black tracking-tight text-[#f0bf29]"
-            >
-              ABOUT
-            </motion.a>
-          </div>
-        </div>
-      </section>
-
       {/* Skills Section */}
       <section id="skills" className="py-24 px-8">
         <div className="max-w-7xl mx-auto">
@@ -284,7 +204,6 @@ export default function App() {
 
       {/* Footer */}
       <motion.footer
-        id="contact"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
