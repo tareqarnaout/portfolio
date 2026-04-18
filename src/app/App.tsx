@@ -120,13 +120,21 @@ export default function App() {
           {floatingIcons.map((icon) => (
             <div
               key={icon.id}
-              className={`absolute ${icon.className} animate-float text-black/20`}
+              className={`absolute ${icon.className} animate-drift-x text-black/20`}
               style={{
                 animationDelay: icon.delay,
-                animationDuration: icon.duration,
+                animationDuration: `calc(${icon.duration} + 2.2s)`,
               }}
             >
-              <SoftwareIcon type={icon.type} />
+              <div
+                className="w-full h-full animate-float"
+                style={{
+                  animationDelay: icon.delay,
+                  animationDuration: icon.duration,
+                }}
+              >
+                <SoftwareIcon type={icon.type} />
+              </div>
             </div>
           ))}
         </div>
