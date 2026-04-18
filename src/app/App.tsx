@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Monitor, Code2, Cpu, Zap, Globe } from 'lucide-react';
 import { motion } from 'motion/react';
 import CustomCursor from './components/CustomCursor';
 import HamburgerButton from './components/HamburgerButton';
@@ -8,6 +7,17 @@ import ProjectsList from './components/ProjectsList';
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const skills = [
+    'Python',
+    'JavaScript',
+    'ASP.NET',
+    'Flutter',
+    'C++',
+    'SQL',
+    'HTML',
+    'CSS',
+    'PHP',
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE5F1] via-[#FAFBFC] to-[#E5F4FF] font-['Inter',sans-serif] overflow-x-hidden">
@@ -17,25 +27,6 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-8 relative overflow-hidden">
-        {/* Animated Tech Icons */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-[10%] opacity-20 animate-float" style={{ animationDelay: '0s' }}>
-            <Monitor size={80} strokeWidth={1.5} />
-          </div>
-          <div className="absolute top-40 right-[15%] opacity-20 animate-float" style={{ animationDelay: '0.5s' }}>
-            <Code2 size={100} strokeWidth={1.5} />
-          </div>
-          <div className="absolute bottom-32 left-[20%] opacity-20 animate-float" style={{ animationDelay: '1s' }}>
-            <Cpu size={90} strokeWidth={1.5} />
-          </div>
-          <div className="absolute top-[60%] right-[10%] opacity-20 animate-float" style={{ animationDelay: '1.5s' }}>
-            <Zap size={70} strokeWidth={1.5} />
-          </div>
-          <div className="absolute bottom-20 right-[25%] opacity-20 animate-float" style={{ animationDelay: '2s' }}>
-            <Globe size={85} strokeWidth={1.5} />
-          </div>
-        </div>
-
         <div className="text-center relative z-10">
           <div className="overflow-hidden">
             <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[12rem] font-black tracking-tighter leading-none animate-slide-up">
@@ -58,8 +49,41 @@ export default function App() {
             </h2>
           </div>
           <p className="text-xl md:text-2xl mt-12 text-black/60 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            Specializing in High-Performance Computing, low-level systems (C++/CUDA), and AI architectures
+            Because great code is where innovation meets execution
           </p>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section id="skills" className="py-24 px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
+          >
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight">Tech Stack</h2>
+            <p className="text-black/60 mt-4 text-lg md:text-xl">
+              These are the core technologies I use to build practical, production-ready software.
+            </p>
+          </motion.div>
+
+          <div className="mt-12 flex flex-wrap gap-4">
+            {skills.map((skill, index) => (
+              <motion.span
+                key={skill}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: index * 0.06 }}
+                className="rounded-full border border-black/15 bg-white/80 px-5 py-2 text-sm md:text-base font-bold tracking-wide"
+              >
+                {skill}
+              </motion.span>
+            ))}
+          </div>
         </div>
       </section>
 
