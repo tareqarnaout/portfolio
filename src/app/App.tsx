@@ -14,42 +14,42 @@ const floatingIcons: Array<{
   delay: string;
   duration: string;
 }> = [
-  {
-    id: 'icon-code',
-    type: 'code',
-    className: 'left-[7%] top-[18%] w-14 h-14 md:w-16 md:h-16',
-    delay: '0.2s',
-    duration: '6.5s',
-  },
-  {
-    id: 'icon-terminal',
-    type: 'terminal',
-    className: 'right-[12%] top-[20%] w-12 h-12 md:w-14 md:h-14',
-    delay: '1s',
-    duration: '7.2s',
-  },
-  {
-    id: 'icon-gear',
-    type: 'gear',
-    className: 'left-[14%] bottom-[16%] w-14 h-14 md:w-[68px] md:h-[68px]',
-    delay: '1.6s',
-    duration: '8s',
-  },
-  {
-    id: 'icon-api',
-    type: 'api',
-    className: 'right-[9%] bottom-[22%] w-14 h-14 md:w-16 md:h-16',
-    delay: '0.8s',
-    duration: '6.8s',
-  },
-  {
-    id: 'icon-chip',
-    type: 'chip',
-    className: 'left-1/2 top-[10%] -translate-x-1/2 w-10 h-10 md:w-12 md:h-12',
-    delay: '1.2s',
-    duration: '7.6s',
-  },
-];
+    {
+      id: 'icon-code',
+      type: 'code',
+      className: 'left-[7%] top-[18%] w-14 h-14 md:w-16 md:h-16',
+      delay: '0.2s',
+      duration: '6.5s',
+    },
+    {
+      id: 'icon-terminal',
+      type: 'terminal',
+      className: 'right-[12%] top-[20%] w-12 h-12 md:w-14 md:h-14',
+      delay: '1s',
+      duration: '7.2s',
+    },
+    {
+      id: 'icon-gear',
+      type: 'gear',
+      className: 'left-[14%] bottom-[16%] w-14 h-14 md:w-[68px] md:h-[68px]',
+      delay: '1.6s',
+      duration: '8s',
+    },
+    {
+      id: 'icon-api',
+      type: 'api',
+      className: 'right-[9%] bottom-[22%] w-14 h-14 md:w-16 md:h-16',
+      delay: '0.8s',
+      duration: '6.8s',
+    },
+    {
+      id: 'icon-chip',
+      type: 'chip',
+      className: 'left-1/2 top-[10%] -translate-x-1/2 w-10 h-10 md:w-12 md:h-12',
+      delay: '1.2s',
+      duration: '7.6s',
+    },
+  ];
 
 function SoftwareIcon({ type }: { type: FloatingIconType }) {
   switch (type) {
