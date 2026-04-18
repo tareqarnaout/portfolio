@@ -73,26 +73,13 @@ export default function ProjectsList() {
   const listRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const imageImgRef = useRef<HTMLImageElement>(null);
-  const currentProjectRef = useRef<string | null>(null);
 
   useEffect(() => {
     const image = imageRef.current;
     const imageImg = imageImgRef.current;
     if (!image || !imageImg) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (currentProjectRef.current) {
-        gsap.to(image, {
-          x: e.clientX,
-          y: e.clientY,
-          duration: 0.6,
-          ease: 'power2.out',
-        });
-      }
-    };
-
-    const handleProjectHover = (projectId: string, imageSrc: string) => {
-      currentProjectRef.current = projectId;
+    const handleProjectHover = (_projectId: string, imageSrc: string) => {
       imageImg.src = imageSrc;
 
       gsap.to(image, {
@@ -104,8 +91,6 @@ export default function ProjectsList() {
     };
 
     const handleProjectLeave = () => {
-      currentProjectRef.current = null;
-
       gsap.to(image, {
         opacity: 0,
         scale: 0.8,
@@ -115,25 +100,25 @@ export default function ProjectsList() {
     };
 
     const projectItems = listRef.current?.querySelectorAll('[data-project-id]');
+    const cleanupCallbacks: Array<() => void> = [];
+
     projectItems?.forEach((item) => {
       const projectId = item.getAttribute('data-project-id') || '';
       const imageSrc = item.getAttribute('data-project-image') || '';
+      const onMouseEnter = () => handleProjectHover(projectId, imageSrc);
+      const onMouseLeave = () => handleProjectLeave();
 
-      item.addEventListener('mouseenter', () => handleProjectHover(projectId, imageSrc));
-      item.addEventListener('mouseleave', handleProjectLeave);
+      item.addEventListener('mouseenter', onMouseEnter);
+      item.addEventListener('mouseleave', onMouseLeave);
+
+      cleanupCallbacks.push(() => {
+        item.removeEventListener('mouseenter', onMouseEnter);
+        item.removeEventListener('mouseleave', onMouseLeave);
+      });
     });
 
-    window.addEventListener('mousemove', handleMouseMove);
-
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      projectItems?.forEach((item) => {
-        const projectId = item.getAttribute('data-project-id') || '';
-        const imageSrc = item.getAttribute('data-project-image') || '';
-
-        item.removeEventListener('mouseenter', () => handleProjectHover(projectId, imageSrc));
-        item.removeEventListener('mouseleave', handleProjectLeave);
-      });
+      cleanupCallbacks.forEach((cleanup) => cleanup());
     };
   }, []);
 
@@ -196,11 +181,9 @@ export default function ProjectsList() {
 
       <div
         ref={imageRef}
-        className="fixed w-96 h-96 pointer-events-none z-40 opacity-0"
+        className="fixed right-8 top-1/2 -translate-y-1/2 w-80 h-80 xl:w-96 xl:h-96 pointer-events-none z-40 opacity-0 hidden lg:block"
         style={{
-          left: '-192px',
-          top: '-192px',
-          transform: 'translate(0, 0)',
+          transformOrigin: 'center center',
         }}
       >
         <img
