@@ -3,22 +3,29 @@ import { gsap } from 'gsap';
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const posRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const cursor = cursorRef.current;
     if (!cursor) return;
 
-    // Hide default cursor on body
-    document.body.style.cursor = 'none';
+    // Keep native cursor for touch/coarse pointers.
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    if (!hasFinePointer) return;
+
+    let isNativeCursorHidden = false;
 
     const handleMouseMove = (e: MouseEvent) => {
-      posRef.current = { x: e.clientX, y: e.clientY };
+      if (!isNativeCursorHidden) {
+        // Hide native cursor only after first move so user never loses cursor visibility.
+        document.body.style.cursor = 'none';
+        isNativeCursorHidden = true;
+        gsap.to(cursor, { autoAlpha: 1, duration: 0.15, ease: 'power2.out' });
+      }
 
       gsap.to(cursor, {
         x: e.clientX,
         y: e.clientY,
-        duration: 0.3,
+        duration: 0.2,
         ease: 'power2.out',
       });
     };
@@ -50,7 +57,9 @@ export default function CustomCursor() {
     document.addEventListener('mouseleave', handleMouseLeave, true);
 
     return () => {
-      document.body.style.cursor = 'auto';
+      if (isNativeCursorHidden) {
+        document.body.style.cursor = 'auto';
+      }
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseenter', handleMouseEnter, true);
       document.removeEventListener('mouseleave', handleMouseLeave, true);
@@ -60,10 +69,11 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed w-8 h-8 border-2 border-black rounded-full pointer-events-none z-[9999] mix-blend-difference"
+      className="fixed w-6 h-6 rounded-full pointer-events-none z-[9999] border-2 border-black bg-white/30 shadow-[0_0_0_1px_rgba(255,255,255,0.9)]"
       style={{
-        left: '-16px',
-        top: '-16px',
+        left: '-12px',
+        top: '-12px',
+        opacity: 0,
         transform: 'translate(0, 0)',
       }}
     />
