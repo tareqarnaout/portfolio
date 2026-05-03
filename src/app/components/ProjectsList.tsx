@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 
 interface Project {
@@ -10,78 +11,43 @@ interface Project {
   githubUrl: string;
 }
 
-const projects: Project[] = [
-  {
-    id: '1',
-    title: 'Data Science Competition CV',
-    description:
-      'Computer vision project for a data science competition. Implements machine learning algorithms and deep learning models for image classification and analysis.',
-    tech: ['Python', 'TensorFlow', 'OpenCV'],
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop',
-    category: 'AI / ML',
-    githubUrl: 'https://github.com/tareqarnaout/Data-Science-Competition-CV',
-  },
-  {
-    id: '2',
-    title: 'Database Management System',
-    description:
-      'A comprehensive database management system implementing CRUD operations, query optimization, and transaction management for scalable storage.',
-    tech: ['SQL', 'Database Design', 'Optimization'],
-    image: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=500&fit=crop',
-    category: 'Database',
-    githubUrl: 'https://github.com/tareqarnaout/Database-Management-System',
-  },
-  {
-    id: '3',
-    title: 'Mustamer App',
-    description:
-      'A modern mobile application featuring user authentication, real-time synchronization, and an intuitive interface.',
-    tech: ['Mobile Development', 'API Integration', 'UI/UX'],
-    image: 'https://images.unsplash.com/photo-1526498460520-4c246339dccb?w=800&h=500&fit=crop',
-    category: 'Mobile',
-    githubUrl: 'https://github.com/tareqarnaout/mustamer-app',
-  },
-  {
-    id: '4',
-    title: 'Web Project',
-    description:
-      'A full-stack web application with responsive design, RESTful API integration, user authentication, and dynamic content rendering.',
-    tech: ['HTML/CSS', 'JavaScript', 'Web Development'],
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=500&fit=crop',
-    category: 'Web',
-    githubUrl: 'https://github.com/tareqarnaout/WebProject',
-  },
-  {
-    id: '5',
-    title: 'Operating System Project',
-    description:
-      'An operating systems project featuring process scheduling, memory management, and file system operations.',
-    tech: ['C/C++', 'Operating Systems', 'System Programming'],
-    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800&h=500&fit=crop',
-    category: 'Systems',
-    githubUrl: 'https://github.com/tareqarnaout/osProject',
-  },
-  {
-    id: '6',
-    title: 'Todoey',
-    description:
-      'A productivity-focused todo application with task management, priority settings, and deadline tracking.',
-    tech: ['Mobile App', 'Task Management', 'Local Storage'],
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=500&fit=crop',
-    category: 'Mobile',
-    githubUrl: 'https://github.com/tareqarnaout/todoey',
-  },
-  {
-    id: '7',
-    title: 'OOP Pharmacy System',
-    description:
-      'A pharmacy management system built with object-oriented programming principles, including inventory and prescription handling.',
-    tech: ['OOP', 'Design Patterns', 'Database'],
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop',
-    category: 'Systems',
-    githubUrl: 'https://github.com/tareqarnaout/OOP-Pharmacy',
-  },
-];
+const categoryImages: Record<Project['category'], string> = {
+  'AI / ML': 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop',
+  Database: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=500&fit=crop',
+  Mobile: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=500&fit=crop',
+  Web: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=500&fit=crop',
+  Systems: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800&h=500&fit=crop',
+};
+
+function mapLanguageToCategory(language: string | null): Project['category'] {
+  if (!language) {
+    return 'Systems';
+  }
+
+  const normalized = language.toLowerCase();
+
+  if (['python', 'jupyter notebook'].includes(normalized)) {
+    return 'AI / ML';
+  }
+
+  if (['sql', 'plpgsql', 'postgresql'].includes(normalized)) {
+    return 'Database';
+  }
+
+  if (['dart', 'flutter', 'kotlin', 'swift'].includes(normalized)) {
+    return 'Mobile';
+  }
+
+  if (['javascript', 'typescript', 'html', 'css', 'php'].includes(normalized)) {
+    return 'Web';
+  }
+
+  return 'Systems';
+}
+
+function formatTitle(name: string) {
+  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
+}
 
 function getCategoryStyles(category: Project['category']) {
   switch (category) {
@@ -119,6 +85,66 @@ function getCategoryStyles(category: Project['category']) {
 }
 
 export default function ProjectsList() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadRepos() {
+      try {
+        const response = await fetch(
+          'https://api.github.com/users/tareqarnaout/repos?per_page=100&sort=updated'
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch GitHub repos');
+        }
+
+        const repos: Array<{
+          id: number;
+          name: string;
+          description: string | null;
+          html_url: string;
+          language: string | null;
+          fork: boolean;
+        }> = await response.json();
+
+        const mapped = repos.map((repo, index) => {
+          const category = mapLanguageToCategory(repo.language);
+
+          return {
+            id: String(repo.id ?? index + 1),
+            title: formatTitle(repo.name),
+            description: repo.description || 'No description provided yet.',
+            tech: [repo.language || 'General'],
+            image: categoryImages[category],
+            category,
+            githubUrl: repo.html_url,
+          };
+        });
+
+        if (isActive) {
+          setProjects(mapped);
+        }
+      } catch (error) {
+        if (isActive) {
+          setProjects([]);
+        }
+      } finally {
+        if (isActive) {
+          setHasLoaded(true);
+        }
+      }
+    }
+
+    loadRepos();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   return (
     <section className="py-28 px-8 md:px-16 max-w-7xl mx-auto" id="projects">
       <div className="mb-12 md:mb-16">
@@ -256,6 +282,11 @@ export default function ProjectsList() {
             </a>
           </motion.div>
         ))}
+        {hasLoaded && projects.length === 0 && (
+          <div className="col-span-full border border-black/10 bg-white/70 p-6 text-center text-sm uppercase tracking-[0.2em] font-bold text-black/40">
+            No public repositories found
+          </div>
+        )}
       </div>
 
       <div className="mt-12 flex justify-center">
