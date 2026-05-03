@@ -49,6 +49,10 @@ function formatTitle(name: string) {
   return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
+function normalizeRepoName(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function getCategoryStyles(category: Project['category']) {
   switch (category) {
     case 'AI / ML':
@@ -110,19 +114,31 @@ export default function ProjectsList() {
           fork: boolean;
         }> = await response.json();
 
-        const mapped = repos.map((repo, index) => {
-          const category = mapLanguageToCategory(repo.language);
+        const excludedRepos = new Set([
+          'aya',
+          'psutgithubtest',
+          'domination',
+          'fluttercodespace',
+          'micard',
+          'micardcards',
+          'iamrich',
+        ]);
 
-          return {
-            id: String(repo.id ?? index + 1),
-            title: formatTitle(repo.name),
-            description: repo.description || 'No description provided yet.',
-            tech: [repo.language || 'General'],
-            image: categoryImages[category],
-            category,
-            githubUrl: repo.html_url,
-          };
-        });
+        const mapped = repos
+          .filter((repo) => !excludedRepos.has(normalizeRepoName(repo.name)))
+          .map((repo, index) => {
+            const category = mapLanguageToCategory(repo.language);
+
+            return {
+              id: String(repo.id ?? index + 1),
+              title: formatTitle(repo.name),
+              description: repo.description || 'No description provided yet.',
+              tech: [repo.language || 'General'],
+              image: categoryImages[category],
+              category,
+              githubUrl: repo.html_url,
+            };
+          });
 
         if (isActive) {
           setProjects(mapped);
