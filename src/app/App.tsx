@@ -101,6 +101,7 @@ export default function App() {
     'JavaScript',
     'ASP.NET',
     'Flutter',
+    'DevOps',
     'C++',
     'SQL',
     'HTML',
@@ -201,6 +202,58 @@ export default function App() {
 
       {/* Projects Section */}
       <ProjectsList />
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
+          >
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight">Contact</h2>
+            <p className="text-black/60 mt-4 text-lg md:text-xl">
+              Let&apos;s connect and talk about new opportunities or collaborations.
+            </p>
+          </motion.div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="border border-black/10 bg-white/80 p-6">
+              <p className="text-xs uppercase tracking-[0.2em] font-bold text-black/40">Phone</p>
+              <a
+                href="tel:0799613263"
+                className="mt-3 block text-lg md:text-xl font-black tracking-tight hover:text-black/60 transition-colors"
+              >
+                0799613263
+              </a>
+            </div>
+
+            <div className="border border-black/10 bg-white/80 p-6">
+              <p className="text-xs uppercase tracking-[0.2em] font-bold text-black/40">Email</p>
+              <a
+                href="mailto:tar20221111@std.psut.edu.jo"
+                className="mt-3 block text-lg md:text-xl font-black tracking-tight hover:text-black/60 transition-colors"
+              >
+                tar20221111@std.psut.edu.jo
+              </a>
+            </div>
+
+            <div className="border border-black/10 bg-white/80 p-6">
+              <p className="text-xs uppercase tracking-[0.2em] font-bold text-black/40">LinkedIn</p>
+              <a
+                href="https://www.linkedin.com/in/tareqarnaout/"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 block text-lg md:text-xl font-black tracking-tight hover:text-black/60 transition-colors"
+              >
+                linkedin.com/in/tareqarnaout
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <motion.footer
