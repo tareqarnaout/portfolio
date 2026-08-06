@@ -55,8 +55,8 @@ export default function OverlayMenu({ isOpen, onClose }: OverlayMenuProps) {
   }, [isOpen]);
 
   const menuItems = [
-    { label: 'WORK', href: '#work' },
-    { label: 'ABOUT', href: '#about' },
+    { label: 'WORK', href: '#projects' },
+    { label: 'BLOG', href: '#blog' },
     { label: 'SKILLS', href: '#skills' },
     { label: 'CONTACT', href: '#contact' },
   ];
@@ -68,7 +68,7 @@ export default function OverlayMenu({ isOpen, onClose }: OverlayMenuProps) {
       onClick={onClose}
     >
       <nav className="text-center">
-        <ul className="space-y-8">
+        <ul className="space-y-5 md:space-y-7">
           {menuItems.map((item, index) => (
             <li
               key={item.label}
@@ -78,7 +78,7 @@ export default function OverlayMenu({ isOpen, onClose }: OverlayMenuProps) {
             >
               <a
                 href={item.href}
-                className="text-white text-6xl md:text-8xl font-black tracking-tight hover:text-gray-300 transition-colors"
+                className="text-white text-5xl md:text-7xl font-black tracking-tight hover:text-gray-300 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   onClose();

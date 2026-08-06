@@ -4,6 +4,7 @@ import CustomCursor from './components/CustomCursor';
 import HamburgerButton from './components/HamburgerButton';
 import OverlayMenu from './components/OverlayMenu';
 import ProjectsList from './components/ProjectsList';
+import BlogSection from './components/BlogSection';
 
 type FloatingIconType = 'code' | 'terminal' | 'gear' | 'api' | 'chip';
 
@@ -202,6 +203,9 @@ export default function App() {
 
       {/* Projects Section */}
       <ProjectsList />
+
+      {/* Blog Section */}
+      <BlogSection />
 
       {/* Contact Section */}
       <section id="contact" className="py-24 px-8">
