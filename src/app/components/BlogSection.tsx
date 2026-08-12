@@ -12,41 +12,109 @@ type Post = {
   readTime: string;
   accent: string;
   stack: string[];
-  sections: Array<{ heading: string; body: string }>;
+  sections: Array<{
+    heading: string;
+    body: string | string[];
+    bullets?: Array<{ label: string; text: string }>;
+    figures?: Array<{
+      src: string;
+      alt: string;
+      caption: string;
+      compact?: boolean;
+    }>;
+  }>;
 };
+
+const articleAsset = (filename: string) =>
+  `${import.meta.env.BASE_URL}blog/maximal-clique-enumeration-parallel/${filename}`;
 
 const posts: Post[] = [
   {
-    id: 'portfolio-with-purpose', number: '01', title: 'Building a portfolio with purpose',
-    excerpt: 'How I turned a simple portfolio into a fast, expressive experience—and the decisions I made along the way.',
-    category: 'Case study', date: 'Aug 2026', readTime: '5 min read', accent: 'bg-[#ff6b9f]',
-    stack: ['React', 'TypeScript', 'Motion'],
+    id: 'maximal-clique-enumeration-parallel',
+    number: '01',
+    title: 'Maximal Clique Enumeration Parallel',
+    excerpt: 'Parallelizing the Bron–Kerbosch algorithm with a task queue on a 32-core CPU—and reaching a 20× speedup in one test case.',
+    category: 'Parallel computing',
+    date: 'Aug 2026',
+    readTime: '4 min read',
+    accent: 'bg-[#ff6b9f]',
+    stack: ['C++', 'OpenMP', 'Graph algorithms'],
     sections: [
-      { heading: 'The idea', body: 'I wanted the portfolio to feel like me before a visitor read a single line. The goal was a confident first impression, a clear path through my work, and enough movement to feel alive without getting in the way.' },
-      { heading: 'How I built it', body: 'I split the interface into focused React components, used TypeScript to keep the content predictable, and added motion only where it supports hierarchy. Project data stays separate from presentation so new work can be added without redesigning the page.' },
-      { heading: 'What I learned', body: 'The strongest visual idea is usually the one you repeat with restraint. Performance, accessibility, and responsive behavior are not finishing touches—they shape the design from the start.' },
-    ],
-  },
-  {
-    id: 'api-to-interface', number: '02', title: 'From API response to useful interface',
-    excerpt: 'A practical look at fetching live project data, shaping it for the UI, and designing for the failure states too.',
-    category: 'Engineering notes', date: 'Jul 2026', readTime: '4 min read', accent: 'bg-[#76d7ff]',
-    stack: ['GitHub API', 'React', 'UX'],
-    sections: [
-      { heading: 'The problem', body: 'Repository data is useful, but it is not presentation-ready. Names need formatting, languages need grouping, and missing descriptions need a thoughtful fallback.' },
-      { heading: 'The implementation', body: 'The projects component fetches repositories once, filters experiments that are not portfolio-ready, and maps every result into a small UI model. Loading and empty states keep the page stable when the network does not cooperate.' },
-      { heading: 'The takeaway', body: 'Good frontend work is often translation work: turning inconsistent external data into something clear and dependable for a person. Designing the unhappy path makes the happy path feel more polished.' },
-    ],
-  },
-  {
-    id: 'motion-that-explains', number: '03', title: 'Motion should explain, not decorate',
-    excerpt: 'What I learned while using animation to guide attention, reveal structure, and add personality without adding friction.',
-    category: 'What I learned', date: 'Jun 2026', readTime: '3 min read', accent: 'bg-[#c8ff67]',
-    stack: ['GSAP', 'Motion', 'Accessibility'],
-    sections: [
-      { heading: 'A useful constraint', body: 'Every animation should answer a question: what changed, where did it come from, or what deserves attention next? If it cannot answer one, it probably does not belong.' },
-      { heading: 'The approach', body: 'Large headings enter once as the reader reaches them, menu items reveal in sequence, and cards respond directly to interaction. Timings stay short and easing does most of the expressive work.' },
-      { heading: 'What changed for me', body: 'I stopped treating motion as a layer added at the end. Planning it with the layout leads to calmer transitions, cleaner code, and an interface that communicates more clearly.' },
+      {
+        heading: 'The problem',
+        body: [
+          'I implemented the Bron–Kerbosch algorithm in C++. The sequential version follows the standard recursive approach: it explores the graph and enumerates every possible maximal clique.',
+          'Consider a graph with four vertices where {0, 1, 2} and {0, 1, 3} are maximal cliques.',
+        ],
+        figures: [
+          {
+            src: articleAsset('example-graph.png'),
+            alt: 'A four-vertex graph with maximal cliques 0, 1, 2 and 0, 1, 3',
+            caption: 'Figure 1 — Example graph with two maximal cliques.',
+          },
+        ],
+      },
+      {
+        heading: 'How it works',
+        body: [
+          'We begin with every vertex in P, while R and X are empty. When both P and X are empty, R is a maximal clique.',
+          'For each vertex v in P, the algorithm adds v to a new R, intersects P and X with the neighbors of v, and recursively calls Bron–Kerbosch. Once that call finishes, v moves from P to X so later branches do not produce the same maximal clique.',
+        ],
+        bullets: [
+          { label: 'R', text: 'vertices already chosen for the current clique' },
+          { label: 'P', text: 'vertices that can still be added to R' },
+          { label: 'X', text: 'vertices already considered, preventing duplicate cliques' },
+        ],
+        figures: [
+          {
+            src: articleAsset('algorithm-walkthrough.png'),
+            alt: 'Step-by-step Bron–Kerbosch traversal of the example graph',
+            caption: 'Figure 2 — Bron–Kerbosch traversal of the example graph.',
+          },
+        ],
+      },
+      {
+        heading: 'Why parallelize?',
+        body: 'Maximal clique enumeration is computationally expensive. In the worst case, the number of maximal cliques grows exponentially, so I explored whether parallel execution could reduce the runtime.',
+        figures: [
+          {
+            src: articleAsset('worst-case-complexity.png'),
+            alt: 'Three to the power of n over three, the worst-case number of maximal cliques',
+            caption: 'Worst-case growth in the number of maximal cliques.',
+            compact: true,
+          },
+        ],
+      },
+      {
+        heading: 'Task-based parallelism',
+        body: [
+          'I ran the algorithm on a 32-core CPU using 32 threads. During the first iteration, every Bron–Kerbosch call becomes a task in a shared queue.',
+          'For the first two levels of the recursion tree, branches with many neighbors also become tasks. This spreads the largest early branches across threads while limiting task-creation overhead. A heavy branch can still appear deeper in the tree, but creating tasks at every depth would cost more than it saves.',
+        ],
+        figures: [
+          {
+            src: articleAsset('task-management.png'),
+            alt: 'Diagram showing OpenMP task creation and thread management across the recursion tree',
+            caption: 'Task management across the first levels of the recursion tree.',
+          },
+        ],
+      },
+      {
+        heading: 'The result',
+        body: 'In one test case, the parallel implementation reduced the runtime by roughly 20× compared with the sequential version.',
+        figures: [
+          {
+            src: articleAsset('parallel-runtime.png'),
+            alt: 'Terminal output showing the parallel algorithm runtime',
+            caption: 'Parallel runtime.',
+          },
+          {
+            src: articleAsset('sequential-runtime.png'),
+            alt: 'Terminal output showing the non-parallel algorithm runtime',
+            caption: 'Sequential runtime.',
+          },
+        ],
+      },
     ],
   },
 ];
@@ -118,7 +186,36 @@ export default function BlogSection() {
                 {activePost.sections.map((section, index) => (
                   <section key={section.heading} className="grid gap-5 border-b border-black/15 py-10 md:grid-cols-[160px_1fr] md:gap-12 md:py-14">
                     <div className="text-xs font-black uppercase tracking-[0.2em] text-black/35">{String(index + 1).padStart(2, '0')} / {section.heading}</div>
-                    <p className="max-w-2xl text-lg leading-8 text-black/70 md:text-xl md:leading-9">{section.body}</p>
+                    <div className="min-w-0">
+                      <div className="max-w-2xl space-y-5">
+                        {(Array.isArray(section.body) ? section.body : [section.body]).map((paragraph) => (
+                          <p key={paragraph} className="text-lg leading-8 text-black/70 md:text-xl md:leading-9">{paragraph}</p>
+                        ))}
+                      </div>
+                      {section.bullets && (
+                        <ul className="mt-8 grid max-w-2xl gap-px overflow-hidden border border-black/15 bg-black/15 sm:grid-cols-3">
+                          {section.bullets.map((item) => (
+                            <li key={item.label} className="bg-white/70 p-5">
+                              <span className="block font-mono text-2xl font-black">{item.label}</span>
+                              <span className="mt-2 block text-sm leading-6 text-black/60">{item.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {section.figures?.map((figure) => (
+                        <figure key={figure.src} className="mt-10">
+                          <div className="overflow-hidden border border-black/10 bg-white p-3 sm:p-5">
+                            <img
+                              src={figure.src}
+                              alt={figure.alt}
+                              loading="lazy"
+                              className={`${figure.compact ? 'max-w-[180px]' : 'max-w-full'} mx-auto h-auto`}
+                            />
+                          </div>
+                          <figcaption className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-black/40">{figure.caption}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
                   </section>
                 ))}
               </div>
