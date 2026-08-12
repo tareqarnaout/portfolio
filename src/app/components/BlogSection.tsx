@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, Clock3, X } from 'lucide-react';
+import { trackPageView } from '../lib/goatCounter';
 
 type Post = {
   id: string;
@@ -122,6 +123,11 @@ const posts: Post[] = [
 export default function BlogSection() {
   const [activePost, setActivePost] = useState<Post | null>(null);
 
+  const openPost = (post: Post) => {
+    setActivePost(post);
+    trackPageView(`/blog/${post.id}`, post.title);
+  };
+
   useEffect(() => {
     if (!activePost) return;
     const previousOverflow = document.body.style.overflow;
@@ -162,7 +168,7 @@ export default function BlogSection() {
               </div>
               <div className="mt-auto pt-10">
                 <div className="mb-5 flex items-center gap-5 text-xs font-bold text-black/40"><span>{post.date}</span><span className="inline-flex items-center gap-1.5"><Clock3 size={13} />{post.readTime}</span></div>
-                <button type="button" onClick={() => setActivePost(post)} className="flex w-full items-center justify-between border-t border-black/15 pt-5 text-left text-xs font-black uppercase tracking-[0.2em]" aria-label={`Read ${post.title}`}>
+                <button type="button" onClick={() => openPost(post)} className="flex w-full items-center justify-between border-t border-black/15 pt-5 text-left text-xs font-black uppercase tracking-[0.2em]" aria-label={`Read ${post.title}`}>
                   Read note <ArrowUpRight size={18} className="transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
                 </button>
               </div>

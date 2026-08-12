@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import CustomCursor from './components/CustomCursor';
 import HamburgerButton from './components/HamburgerButton';
 import OverlayMenu from './components/OverlayMenu';
 import ProjectsList from './components/ProjectsList';
 import BlogSection from './components/BlogSection';
+import VisitorCounter from './components/VisitorCounter';
+import { trackPageView } from './lib/goatCounter';
 
 type FloatingIconType = 'code' | 'terminal' | 'gear' | 'api' | 'chip';
 
@@ -97,6 +99,11 @@ function SoftwareIcon({ type }: { type: FloatingIconType }) {
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    trackPageView('/home', 'Portfolio home');
+  }, []);
+
   const skills = [
     'Python',
     'JavaScript',
@@ -268,9 +275,12 @@ export default function App() {
         className="py-16 px-8 border-t border-black/10"
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-sm text-black/40 uppercase tracking-widest font-bold">
-            © 2026 Tareq
-          </p>
+          <div className="space-y-4 text-center md:text-left">
+            <p className="text-sm text-black/40 uppercase tracking-widest font-bold">
+              © 2026 Tareq
+            </p>
+            <VisitorCounter />
+          </div>
           <div className="flex gap-8">
             <a
               href="https://github.com"
