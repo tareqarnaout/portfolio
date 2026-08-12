@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowUpRight, Clock3, X } from 'lucide-react';
+import { ArrowUpRight, Clock3, Github, X } from 'lucide-react';
 import { trackPageView } from '../lib/goatCounter';
 
 type Post = {
@@ -13,6 +13,7 @@ type Post = {
   readTime: string;
   accent: string;
   stack: string[];
+  repository?: string;
   sections: Array<{
     heading: string;
     body: string | string[];
@@ -40,6 +41,7 @@ const posts: Post[] = [
     readTime: '4 min read',
     accent: 'bg-[#ff6b9f]',
     stack: ['C++', 'OpenMP', 'Graph algorithms'],
+    repository: 'https://github.com/tareqarnaout/maximal-clique-enumeration',
     sections: [
       {
         heading: 'The problem',
@@ -105,14 +107,14 @@ const posts: Post[] = [
         body: 'In one test case, the parallel implementation reduced the runtime by roughly 20× compared with the sequential version.',
         figures: [
           {
+            src: articleAsset('sequential-runtime.png'),
+            alt: 'Terminal output showing the sequential algorithm runtime',
+            caption: 'Sequential runtime.',
+          },
+          {
             src: articleAsset('parallel-runtime.png'),
             alt: 'Terminal output showing the parallel algorithm runtime',
             caption: 'Parallel runtime.',
-          },
-          {
-            src: articleAsset('sequential-runtime.png'),
-            alt: 'Terminal output showing the non-parallel algorithm runtime',
-            caption: 'Sequential runtime.',
           },
         ],
       },
@@ -187,7 +189,14 @@ export default function BlogSection() {
               </div>
               <h2 id="blog-post-title" className="mt-8 max-w-4xl text-5xl font-black leading-[0.95] tracking-tighter sm:text-6xl md:text-8xl">{activePost.title}</h2>
               <p className="mt-8 max-w-3xl text-xl leading-relaxed text-black/55 md:text-2xl">{activePost.excerpt}</p>
-              <div className="mt-10 flex flex-wrap gap-2">{activePost.stack.map((item) => <span key={item} className="border border-black/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest">{item}</span>)}</div>
+              <div className="mt-10 flex flex-wrap items-center gap-2">
+                {activePost.stack.map((item) => <span key={item} className="border border-black/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest">{item}</span>)}
+                {activePost.repository && (
+                  <a href={activePost.repository} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-black px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-black/75">
+                    <Github size={14} aria-hidden="true" /> View code <ArrowUpRight size={13} aria-hidden="true" />
+                  </a>
+                )}
+              </div>
               <div className="mt-20 border-t border-black/15">
                 {activePost.sections.map((section, index) => (
                   <section key={section.heading} className="grid gap-5 border-b border-black/15 py-10 md:grid-cols-[160px_1fr] md:gap-12 md:py-14">
