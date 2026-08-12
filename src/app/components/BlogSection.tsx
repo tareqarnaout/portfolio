@@ -15,8 +15,9 @@ type Post = {
   stack: string[];
   repository?: string;
   sections: Array<{
-    heading: string;
-    body: string | string[];
+    heading?: string;
+    body?: string | string[];
+    afterBullets?: string | string[];
     bullets?: Array<{ label: string; text: string }>;
     figures?: Array<{
       src: string;
@@ -35,7 +36,7 @@ const posts: Post[] = [
     id: 'maximal-clique-enumeration-parallel',
     number: '01',
     title: 'Maximal Clique Enumeration Parallel',
-    excerpt: 'Parallelizing the Bron–Kerbosch algorithm with a task queue on a 32-core CPU—and reaching a 20× speedup in one test case.',
+    excerpt: 'this sped my runtime of the algorithm in one of the cases by 20x.',
     category: 'Parallel computing',
     date: 'Aug 2026',
     readTime: '4 min read',
@@ -44,77 +45,85 @@ const posts: Post[] = [
     repository: 'https://github.com/tareqarnaout/maximal-clique-enumeration',
     sections: [
       {
-        heading: 'The problem',
         body: [
-          'I implemented the Bron–Kerbosch algorithm in C++. The sequential version follows the standard recursive approach: it explores the graph and enumerates every possible maximal clique.',
-          'Consider a graph with four vertices where {0, 1, 2} and {0, 1, 3} are maximal cliques.',
+          'I wrote the Bron-Kerbosch algorithm in C++ in a sequential way basically what the standard algorithm does is go through all nodes in my graph recursively and count the number of all possible maximal cliques.',
+          'lets say we have a graph with 4 nodes where 0 1 2 and 0 1 3 are maximal cliques.',
         ],
         figures: [
           {
             src: articleAsset('example-graph.png'),
             alt: 'A four-vertex graph with maximal cliques 0, 1, 2 and 0, 1, 3',
-            caption: 'Figure 1 — Example graph with two maximal cliques.',
+            caption: 'Figure 1',
           },
         ],
       },
       {
-        heading: 'How it works',
-        body: [
-          'We begin with every vertex in P, while R and X are empty. When both P and X are empty, R is a maximal clique.',
-          'For each vertex v in P, the algorithm adds v to a new R, intersects P and X with the neighbors of v, and recursively calls Bron–Kerbosch. Once that call finishes, v moves from P to X so later branches do not produce the same maximal clique.',
-        ],
+        heading: 'The algorithm has three arrays:',
         bullets: [
           { label: 'R', text: 'vertices already chosen for the current clique' },
           { label: 'P', text: 'vertices that can still be added to R' },
-          { label: 'X', text: 'vertices already considered, preventing duplicate cliques' },
+          { label: 'X', text: "vertices that were already considered, so we shouldn't generate the same clique again" },
         ],
+        afterBullets: [
+          'We start with a P array of all nodes and R empty array and empty X array ,if P and X are empty we consider R a maximal clique and every time we finish a node in our loop we remove it from R and put in X to prevent duplicates.',
+          'for every node in our first iteration we put the node in a newR then we put in newP( P intersect  adj(v)) where v is a node in P, then we put it in newX (x intersect adj(v)) after that we call the BK function. After it finishes for the current v node we remove it from P and add to X so the next node that has v in its neighbors knows not to give a duplicate maximal clique.',
+        ],
+      },
+      {
+        heading: 'A visualization of what happens in our given graph:',
         figures: [
           {
             src: articleAsset('algorithm-walkthrough.png'),
-            alt: 'Step-by-step Bron–Kerbosch traversal of the example graph',
-            caption: 'Figure 2 — Bron–Kerbosch traversal of the example graph.',
+            alt: 'Step-by-step Bron-Kerbosch traversal of the example graph',
+            caption: 'Figure 2',
           },
         ],
       },
       {
-        heading: 'Why parallelize?',
-        body: 'Maximal clique enumeration is computationally expensive. In the worst case, the number of maximal cliques grows exponentially, so I explored whether parallel execution could reduce the runtime.',
+        body: "the problem with the bk algorithm is that’s NP complete if we run this it'll take :",
         figures: [
           {
             src: articleAsset('worst-case-complexity.png'),
             alt: 'Three to the power of n over three, the worst-case number of maximal cliques',
-            caption: 'Worst-case growth in the number of maximal cliques.',
+            caption: '',
             compact: true,
           },
         ],
       },
       {
-        heading: 'Task-based parallelism',
         body: [
-          'I ran the algorithm on a 32-core CPU using 32 threads. During the first iteration, every Bron–Kerbosch call becomes a task in a shared queue.',
-          'For the first two levels of the recursion tree, branches with many neighbors also become tasks. This spreads the largest early branches across threads while limiting task-creation overhead. A heavy branch can still appear deeper in the tree, but creating tasks at every depth would cost more than it saves.',
+          'To give all maximal cliques in the worst case.',
+          'so I tried to lower its time by running it on parallel on a 32 core CPU using 32 threads.',
+          'For the first iteration for every node in the graph i give each BK function call to a thread using task queue and if it happens in the first 2 depths of the recursion tree a node has a lot of neighbors I also add this BK function call to the task queue to try to split the load into multiple tasks, of-course there is a case scenario where deep in the recursion tree there exist a node with a lot of neighbors that will put a lot of load on one thread but I can’t keep putting tasks in the queue because of the overhead it creates.',
         ],
+      },
+      {
+        heading: 'here is a visualization of what I did:',
         figures: [
           {
             src: articleAsset('task-management.png'),
             alt: 'Diagram showing OpenMP task creation and thread management across the recursion tree',
-            caption: 'Task management across the first levels of the recursion tree.',
+            caption: '',
           },
         ],
       },
       {
-        heading: 'The result',
-        body: 'In one test case, the parallel implementation reduced the runtime by roughly 20× compared with the sequential version.',
+        heading: 'not parallel:',
         figures: [
           {
             src: articleAsset('sequential-runtime.png'),
             alt: 'Terminal output showing the sequential algorithm runtime',
-            caption: 'Sequential runtime.',
+            caption: '',
           },
+        ],
+      },
+      {
+        body: 'this sped my runtime of the algorithm in one of the cases by 20x.',
+        figures: [
           {
             src: articleAsset('parallel-runtime.png'),
             alt: 'Terminal output showing the parallel algorithm runtime',
-            caption: 'Parallel runtime.',
+            caption: '',
           },
         ],
       },
@@ -199,14 +208,14 @@ export default function BlogSection() {
               </div>
               <div className="mt-20 border-t border-black/15">
                 {activePost.sections.map((section, index) => (
-                  <section key={section.heading} className="grid gap-5 border-b border-black/15 py-10 md:grid-cols-[160px_1fr] md:gap-12 md:py-14">
-                    <div className="text-xs font-black uppercase tracking-[0.2em] text-black/35">{String(index + 1).padStart(2, '0')} / {section.heading}</div>
+                  <section key={index} className="grid gap-5 border-b border-black/15 py-10 md:grid-cols-[160px_1fr] md:gap-12 md:py-14">
+                    <div className="text-xs font-black uppercase tracking-[0.2em] text-black/35">{String(index + 1).padStart(2, '0')}{section.heading && <>{' / '}{section.heading}</>}</div>
                     <div className="min-w-0">
-                      <div className="max-w-2xl space-y-5">
+                      {section.body && <div className="max-w-2xl space-y-5">
                         {(Array.isArray(section.body) ? section.body : [section.body]).map((paragraph) => (
                           <p key={paragraph} className="text-lg leading-8 text-black/70 md:text-xl md:leading-9">{paragraph}</p>
                         ))}
-                      </div>
+                      </div>}
                       {section.bullets && (
                         <ul className="mt-8 grid max-w-2xl gap-px overflow-hidden border border-black/15 bg-black/15 sm:grid-cols-3">
                           {section.bullets.map((item) => (
@@ -216,6 +225,13 @@ export default function BlogSection() {
                             </li>
                           ))}
                         </ul>
+                      )}
+                      {section.afterBullets && (
+                        <div className="mt-8 max-w-2xl space-y-5">
+                          {(Array.isArray(section.afterBullets) ? section.afterBullets : [section.afterBullets]).map((paragraph) => (
+                            <p key={paragraph} className="text-lg leading-8 text-black/70 md:text-xl md:leading-9">{paragraph}</p>
+                          ))}
+                        </div>
                       )}
                       {section.figures?.map((figure) => (
                         <figure key={figure.src} className="mt-10">
@@ -227,7 +243,7 @@ export default function BlogSection() {
                               className={`${figure.compact ? 'max-w-[180px]' : 'max-w-full'} mx-auto h-auto`}
                             />
                           </div>
-                          <figcaption className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-black/40">{figure.caption}</figcaption>
+                          {figure.caption && <figcaption className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-black/40">{figure.caption}</figcaption>}
                         </figure>
                       ))}
                     </div>
