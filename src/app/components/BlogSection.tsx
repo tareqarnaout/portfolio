@@ -262,13 +262,36 @@ export default function BlogSection() {
 
   const openPost = (post: Post) => {
     setActivePost(post);
-    trackPageView(`/blog/${post.id}`, post.title);
+    window.location.hash = `blog/${post.id}`;
   };
+
+  const closePost = () => {
+    setActivePost(null);
+    window.location.hash = 'blog';
+  };
+
+  useEffect(() => {
+    const openPostFromHash = () => {
+      const postId = window.location.hash.match(/^#blog\/([^/]+)$/)?.[1];
+      const post = posts.find((candidate) => candidate.id === postId) ?? null;
+      setActivePost(post);
+
+      if (post) {
+        trackPageView(`/blog/${post.id}`, post.title);
+      }
+    };
+
+    openPostFromHash();
+    window.addEventListener('hashchange', openPostFromHash);
+    return () => window.removeEventListener('hashchange', openPostFromHash);
+  }, []);
 
   useEffect(() => {
     if (!activePost) return;
     const previousOverflow = document.body.style.overflow;
-    const handleKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && setActivePost(null);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closePost();
+    };
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -317,7 +340,7 @@ export default function BlogSection() {
       <AnimatePresence>
         {activePost && (
           <motion.div className="fixed inset-0 z-[100] overflow-y-auto bg-[#f8f7f2]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="blog-post-title">
-            <button type="button" onClick={() => setActivePost(null)} className="fixed right-5 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black text-white transition-transform hover:rotate-90 md:right-8 md:top-8" aria-label="Close article"><X size={22} /></button>
+            <button type="button" onClick={closePost} className="fixed right-5 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black text-white transition-transform hover:rotate-90 md:right-8 md:top-8" aria-label="Close article"><X size={22} /></button>
             <motion.article initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-5xl px-7 py-24 md:px-12 md:py-28">
               <div className="flex flex-wrap items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-black/45">
                 <span>{activePost.category}</span><span className={`h-2.5 w-2.5 rounded-full ${activePost.accent}`} /><span>{activePost.date}</span><span>{activePost.readTime}</span>
@@ -377,7 +400,7 @@ export default function BlogSection() {
                   </section>
                 ))}
               </div>
-              <button type="button" onClick={() => setActivePost(null)} className="mt-12 inline-flex items-center gap-3 bg-black px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-white"><span aria-hidden="true">←</span> Back to all notes</button>
+              <button type="button" onClick={closePost} className="mt-12 inline-flex items-center gap-3 bg-black px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-white"><span aria-hidden="true">←</span> Back to all notes</button>
             </motion.article>
           </motion.div>
         )}
