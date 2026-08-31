@@ -17,6 +17,7 @@ type Post = {
   sections: Array<{
     heading?: string;
     body?: string | string[];
+    code?: string;
     afterBullets?: string | string[];
     bullets?: Array<{ label: string; text: string }>;
     figures?: Array<{
@@ -28,8 +29,8 @@ type Post = {
   }>;
 };
 
-const articleAsset = (filename: string) =>
-  `${import.meta.env.BASE_URL}blog/maximal-clique-enumeration-parallel/${filename}`;
+const articleAsset = (article: string, filename: string) =>
+  `${import.meta.env.BASE_URL}blog/${article}/${filename}`;
 
 const posts: Post[] = [
   {
@@ -51,7 +52,7 @@ const posts: Post[] = [
         ],
         figures: [
           {
-            src: articleAsset('example-graph.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'example-graph.png'),
             alt: 'A four-vertex graph with maximal cliques 0, 1, 2 and 0, 1, 3',
             caption: 'Figure 1',
           },
@@ -73,7 +74,7 @@ const posts: Post[] = [
         heading: 'A visualization of what happens in our given graph:',
         figures: [
           {
-            src: articleAsset('algorithm-walkthrough.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'algorithm-walkthrough.png'),
             alt: 'Step-by-step Bron-Kerbosch traversal of the example graph',
             caption: 'Figure 2',
           },
@@ -83,7 +84,7 @@ const posts: Post[] = [
         body: "the problem with the bk algorithm is that’s NP complete if we run this it'll take :",
         figures: [
           {
-            src: articleAsset('worst-case-complexity.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'worst-case-complexity.png'),
             alt: 'Three to the power of n over three, the worst-case number of maximal cliques',
             caption: '',
             compact: true,
@@ -101,7 +102,7 @@ const posts: Post[] = [
         heading: 'here is a visualization of what I did:',
         figures: [
           {
-            src: articleAsset('task-management.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'task-management.png'),
             alt: 'Diagram showing OpenMP task creation and thread management across the recursion tree',
             caption: '',
           },
@@ -111,7 +112,7 @@ const posts: Post[] = [
         heading: 'not parallel:',
         figures: [
           {
-            src: articleAsset('sequential-runtime.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'sequential-runtime.png'),
             alt: 'Terminal output showing the sequential algorithm runtime',
             caption: '',
           },
@@ -121,8 +122,133 @@ const posts: Post[] = [
         body: 'this sped my runtime of the algorithm in one of the cases by 20x.',
         figures: [
           {
-            src: articleAsset('parallel-runtime.png'),
+            src: articleAsset('maximal-clique-enumeration-parallel', 'parallel-runtime.png'),
             alt: 'Terminal output showing the parallel algorithm runtime',
+            caption: '',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cluster',
+    number: '02',
+    title: 'Cluster',
+    excerpt: 'In my journey to become the greatest system engineer, I decided to create a simple compression application using python this app utilizes all CPU cores  to compress any file given to it using gzip compression.',
+    category: 'Distributed systems',
+    date: 'Aug 2026',
+    readTime: '3 min read',
+    accent: 'bg-[#65c6ff]',
+    stack: ['Python', 'TCP', 'gzip', 'ProcessPool Executor'],
+    sections: [
+      {
+        body: [
+          'In my journey to become the greatest system engineer, I decided to create a simple compression application using python this app utilizes all CPU cores  to compress any file given to it using gzip compression.',
+          'In detail the app first splits the files into 128 MB chunks then distributes the compression work to the CPU cores , after it finishes it reassembles the chunks and gives the full .gz file.',
+          'After that I thought to myself this easy work why not do a distributed cluster between two laptop nodes so I can learn how to handle the complexity of distributed work.',
+          'So I started by installing Linux mint xfce on two old laptops i had connecting both directly through Ethernet, after that I wrote a simple python socket script to send messages between the two nodes just to test things out.',
+          'OK easy work finished now i had to write the code to handle the distributed work, the architecture I ended up with is as the following:',
+        ],
+      },
+      {
+        code: `                DISTRIBUTED PARALLEL COMPRESSION CLUSTER
+
+                          ┌───────────────┐
+                          │   BIG FILE    │
+                          │   10+ GB      │
+                          └───────┬───────┘
+                                  │
+                                  ▼
+                          ┌───────────────┐
+                          │    Laptop 1   │
+                          │  Controller   │
+                          └───────┬───────┘
+                                  │
+                            Split into
+                              chunks
+                                  │
+                ┌─────────────────┴─────────────────┐
+                │                                   │
+                ▼                                   ▼
+         LOCAL CHUNKS                        REMOTE CHUNKS
+                │                                   │
+                │                                   │ TCP
+                │                                   ▼
+                │                           ┌───────────────┐
+                │                           │   Laptop 2    │
+                │                           │    Worker     │
+                │                           └───────┬───────┘
+                │                                   │
+                │                           Receive chunks
+                │                                   │
+                │                                   ▼
+                │                         ┌─────────────────┐
+                │                         │ ProcessPool     │
+                │                         │ Executor        │
+                │                         └────────┬────────┘
+                │                                  │
+                │                    ┌─────────────┼─────────────┐
+                │                    ▼             ▼             ▼
+                │                  CPU 1         CPU 2         CPU 3 ...
+                │                    │             │             │
+                │                    └─────────────┴─────────────┐
+                │                                                │
+                │                                          Compress
+                │                                                │
+                │                                                ▼
+                │                                       Compressed chunks
+                │                                                │
+                │                                                │ TCP
+                │                                                ▼
+                │                                         ┌──────────────┐
+                │                                         │   Laptop 1   │
+                │                                         └──────┬───────┘
+                │                                                │
+                ▼                                                │
+         ┌───────────────┐                                       │
+         │ ProcessPool   │                                       │
+         │ Executor      │                                       │
+         └───────┬───────┘                                       │
+                 │                                               │
+      ┌──────────┼──────────┐                                    │
+      ▼          ▼          ▼                                    │
+    CPU 1      CPU 2      CPU 3 ...                               │
+      │          │          │                                    │
+      └──────────┴──────────┘                                    │
+                 │                                               │
+             Compress                                            │
+                 │                                               │
+                 └──────────────────────┬────────────────────────┘
+                                        │
+                                        ▼
+                              ┌─────────────────────┐
+                              │ Compressed Chunks   │
+                              │                     │
+                              │ 0,1,2,3,4,...       │
+                              └──────────┬──────────┘
+                                         │
+                                  Sort by chunk ID
+                                         │
+                                         ▼
+                              ┌─────────────────────┐
+                              │      Merge          │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+                              ┌─────────────────────┐
+                              │   FINAL FILE.GZ     │
+                              └─────────────────────┘`,
+      },
+      {
+        body: [
+          'Node1(laptop1) is a the main server that handles the file split then using two threads it sends half of the work to node2 which also has 2 threads one that receives/sends the chunks and one that compresses these chunks. after node 2 finishes compressing the chunks it sends them back over network to node1 which has a thread waiting to receive the compressed chunks and save toi hard disk to save ram(expensive now a days) and if the first thread in node 1 has already finished compressing its half the program then assembles all chunks from node1 and node2 to create the final result .gz file.  \n(for the two nodes the compressing is parallel on the CPU cores to save time)',
+          "For a compression algorithm splitting files in to chunks then distribute into two nodes creates overhead so it wasn't really about making something super fast it was about learning how to handle the complexity of organizing chunks of data between two nodes and sending them over network using TCP without mixing the data and joining them again in correct order.",
+          'here’s a pic of my perfect cluster:',
+        ],
+        figures: [
+          {
+            src: articleAsset('cluster', 'image.png'),
+            alt: 'The two-laptop compression cluster',
             caption: '',
           },
         ],
@@ -216,6 +342,7 @@ export default function BlogSection() {
                           <p key={paragraph} className="text-lg leading-8 text-black/70 md:text-xl md:leading-9">{paragraph}</p>
                         ))}
                       </div>}
+                      {section.code && <pre className="mt-8 overflow-x-auto border border-black/15 bg-black p-5 text-xs leading-5 text-white sm:text-sm"><code>{section.code}</code></pre>}
                       {section.bullets && (
                         <ul className="mt-8 grid max-w-2xl gap-px overflow-hidden border border-black/15 bg-black/15 sm:grid-cols-3">
                           {section.bullets.map((item) => (
