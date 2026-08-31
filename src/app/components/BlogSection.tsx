@@ -140,6 +140,7 @@ const posts: Post[] = [
     readTime: '3 min read',
     accent: 'bg-[#65c6ff]',
     stack: ['Python', 'TCP', 'gzip', 'ProcessPool Executor'],
+    repository: 'https://github.com/tareqarnaout/cluster',
     sections: [
       {
         body: [
